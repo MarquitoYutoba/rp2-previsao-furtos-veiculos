@@ -1,0 +1,95 @@
+{
+  "total_registros": 30000,
+  "periodo": {
+    "inicio": "2005-06-01",
+    "fim": "2026-06-30"
+  },
+  "por_ano_arquivo": {
+    "2024": 10000,
+    "2025": 10000,
+    "2026": 10000
+  },
+  "periodo_dia": {
+    "Noite": 8357,
+    "Tarde": 7047,
+    "Manha": 5809,
+    "Madrugada": 3376
+  },
+  "top_bairros": {
+    "VILA MARIANA": 749,
+    "TATUAPE": 717,
+    "IPIRANGA": 705,
+    "SANTO AMARO": 642,
+    "VILA MATILDE": 601,
+    "VILA PRUDENTE": 563,
+    "ITAQUERA": 540,
+    "SANTANA": 534,
+    "PENHA": 530,
+    "LAPA": 512
+  },
+  "top_marcas": {
+    "HONDA/CG 160 FAN": 1456,
+    "HONDA/CG 160 TITAN": 786,
+    "HONDA/CG 160 START": 531,
+    "FIAT/MOBI LIKE": 384,
+    "HYUNDAI/HB20 1.0M COMFOR": 310,
+    "GM/CORSA WIND": 296,
+    "HONDA/PCX 150": 281,
+    "FIAT/ARGO DRIVE 1.0": 250,
+    "RENAULT/KWID ZEN 2": 235,
+    "HONDA/ELITE 125": 234
+  },
+  "top_cores": {
+    "Preta": 6772,
+    "Branco": 6213,
+    "Prata": 5304,
+    "Cinza": 4425,
+    "Vermelho": 3856,
+    "Azul": 2148,
+    "Verde": 570,
+    "Bege": 235
+  },
+  "top_tipos_local": {
+    "Via Pública": 26181,
+    "Estacionamento/Garagem": 1838,
+    "Residência": 657,
+    "Comércio e Serviços": 383,
+    "Outros": 364,
+    "Centro Comercial/Empresarial": 133,
+    "Condomínio Residencial": 97,
+    "Area não Ocupada": 47
+  },
+  "tipos_veiculo": {
+    "Automovel": 18656,
+    "Motociclo": 8556,
+    "Caminhonete": 1007,
+    "Camioneta": 822,
+    "Motoneta": 298,
+    "Utilitário": 295,
+    "Não informado": 199,
+    "Caminhão": 86,
+    "Micro-onibus": 29,
+    "Inexistente": 14,
+    "Reboque": 11,
+    "Caminhão trator": 8,
+    "Ciclomoto": 7,
+    "Semi-reboque": 4,
+    "Onibus": 4,
+    "Trator rodas": 2,
+    "Bicicleta": 1,
+    "Motor casa": 1
+  },
+  "missing": {
+    "HORA_OCORRENCIA": 16.0,
+    "BAIRRO": 0.7,
+    "DESCR_TIPOLOCAL": 0.2,
+    "DESCR_SUBTIPOLOCAL": 0.1,
+    "ANO_FABRICACAO": 0.7,
+    "PERIODO_DIA": 18.0,
+    "HORA_INT": 18.0
+  },
+  "ano_fabricacao": {
+    "media": 2016.4,
+    "mediana": 2019.0
+  }
+}

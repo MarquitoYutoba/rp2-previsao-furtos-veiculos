@@ -1,0 +1,66 @@
+{
+  "anos": [
+    2024,
+    2025,
+    2026
+  ],
+  "registros_por_ano": 10000,
+  "total": 30000,
+  "filtros": {
+    "municipio": "S.PAULO",
+    "descricao_ocorrencia": "Furtado"
+  },
+  "colunas": [
+    "ANO_BO",
+    "NUM_BO",
+    "DATA_OCORRENCIA_BO",
+    "HORA_OCORRENCIA",
+    "ANO_OCORRENCIA",
+    "MES_OCORRENCIA",
+    "NOME_MUNICIPIO",
+    "BAIRRO",
+    "LATITUDE",
+    "LONGITUDE",
+    "CD_IBGE",
+    "LOGRADOURO",
+    "DESCR_TIPOLOCAL",
+    "DESCR_SUBTIPOLOCAL",
+    "RUBRICA",
+    "DESCR_OCORRENCIA_VEICULO",
+    "DESCR_TIPO_VEICULO",
+    "DESCR_MARCA_VEICULO",
+    "ANO_FABRICACAO",
+    "DESC_COR_VEICULO",
+    "DIA_SEMANA",
+    "PERIODO_DIA",
+    "HORA_INT",
+    "ANO_ARQUIVO"
+  ],
+  "colunas_base": [
+    "ANO_BO",
+    "NUM_BO",
+    "DATA_OCORRENCIA_BO",
+    "HORA_OCORRENCIA",
+    "ANO_OCORRENCIA",
+    "MES_OCORRENCIA",
+    "NOME_MUNICIPIO",
+    "BAIRRO",
+    "LATITUDE",
+    "LONGITUDE",
+    "CD_IBGE",
+    "LOGRADOURO",
+    "DESCR_TIPOLOCAL",
+    "DESCR_SUBTIPOLOCAL",
+    "RUBRICA",
+    "DESCR_OCORRENCIA_VEICULO",
+    "DESCR_TIPO_VEICULO",
+    "DESCR_MARCA_VEICULO",
+    "ANO_FABRICACAO",
+    "DESC_COR_VEICULO"
+  ],
+  "colunas_derivadas": [
+    "DIA_SEMANA",
+    "PERIODO_DIA",
+    "HORA_INT"
+  ]
+}
