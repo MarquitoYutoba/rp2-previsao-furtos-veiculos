@@ -20,3 +20,9 @@ chunk_size_test_ll: 512
 select_by: loglik_test   # loglik_test | pai_at_10
 
 pai_alphas: [0.01, 0.05, 0.10, 0.20]
+
+# Passo 5 — exportação (versionável no Git)
+reports_dir: reports/stkde
+cell_size_m: 500
+pai_curve_points: 100
+map_test_max: 3000
