@@ -24,3 +24,15 @@ split:
   arquivos_entrada:
     csv: data/processed/stkde_events_clean.csv
     parquet: data/processed/stkde_events_clean.parquet
+
+# Malha espacial para STKDE (UTM, metros)
+grid:
+  cell_size_m: 500
+  padding_cells: 0
+  col_x: x_utm
+  col_y: y_utm
+  arquivos_entrada:
+    train_parquet: data/processed/stkde_train.parquet
+    train_csv: data/processed/stkde_train.csv
+    test_parquet: data/processed/stkde_test.parquet
+    test_csv: data/processed/stkde_test.csv
