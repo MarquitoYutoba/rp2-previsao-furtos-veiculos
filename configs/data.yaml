@@ -13,3 +13,14 @@ alinhamento_ano_arquivo: false
 
 # Projeção para STKDE (metros) — SIRGAS 2000 / UTM zone 23S
 utm_epsg: 31983
+
+# Split temporal STKDE (por ANO_ARQUIVO do arquivo SSP)
+split:
+  coluna_ano: ANO_ARQUIVO
+  anos_treino: [2024, 2025]
+  anos_teste: [2026]
+  # Recalcula t_horas com t0 = primeira ocorrência do treino
+  recalcular_t_horas: true
+  arquivos_entrada:
+    csv: data/processed/stkde_events_clean.csv
+    parquet: data/processed/stkde_events_clean.parquet
