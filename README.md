@@ -1,146 +1,180 @@
 # rp2-previsao-furtos-veiculos
 
-# 🐍 Configuração do Ambiente Python
+Pipeline de **previsão espaço-temporal de furtos de veículos** (SSP-SP, São Paulo) com **STKDE** (*Spatiotemporal Kernel Density Estimation*). O Random Forest será integrado depois; neste repositório está implementado o fluxo STKDE completo (limpeza → split temporal → malha 500 m → tuning → figuras).
 
-Este guia explica como configurar o ambiente de desenvolvimento do projeto Python, criar e ativar um ambiente virtual, instalar as dependências e desativar o ambiente quando necessário.
+**Amostra:** 30.000 registros (`Furto (art. 155)`, `S.PAULO`), ~10.000 por ano-arquivo (2024, 2025, 2026).
 
-## 1. Pré-requisitos
+---
 
-Antes de começar, verifique se o Python e o Git estão instalados na sua máquina.
+## Estrutura do repositório
 
-- **Python:** https://www.python.org/downloads/
-- **Git:** https://git-scm.com/downloads/
-
-Para verificar a instalação do Python, execute no terminal:
-
-**Windows:**
-```bash
-python --version
 ```
-
-**Linux:**
-```bash
-python3 --version
-```
-
-## 2. Clone o repositório
-
-Caso ainda não tenha o projeto na sua máquina, clone o repositório:
-
-```bash
-git clone URL_DO_REPOSITORIO
-```
-
-Entre na pasta do projeto:
-
-```bash
-cd NOME_DO_PROJETO
-```
-
-Substitua `URL_DO_REPOSITORIO` e `NOME_DO_PROJETO` pelas informações do seu repositório.
-
-## 3. Crie o ambiente virtual
-
-O ambiente virtual (`venv`) permite instalar as dependências do projeto de forma isolada, sem interferir nas outras instalações do Python da máquina.
-
-### Windows
-
-```bash
-python -m venv .venv
-```
-
-### Linux
-
-```bash
-python3 -m venv .venv
-```
-
-Esse comando cria uma pasta chamada `.venv` na raiz do projeto.
-
-## 4. Ative o ambiente virtual
-
-Antes de instalar as dependências, ative o ambiente virtual correspondente ao seu sistema operacional.
-
-### Windows — Prompt de Comando (CMD)
-
-```cmd
-.venv\Scripts\activate.bat
-```
-
-### Windows — PowerShell
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-> **Observação:** caso o PowerShell bloqueie a execução do script, pode ser necessário ajustar a política de execução para o usuário atual. Consulte a documentação oficial do PowerShell antes de alterar essa configuração.
-
-### Linux
-
-```bash
-source .venv/bin/activate
-```
-
-Após a ativação, normalmente aparecerá `(.venv)` no início da linha do terminal, indicando que o ambiente virtual está ativo.
-
-## 5. Instale as dependências
-
-Com o ambiente virtual ativado, instale todas as dependências listadas no arquivo `requirements.txt`:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-Esse comando instala as bibliotecas necessárias para executar o projeto.
-
-**Importante:** execute o comando na raiz do projeto, onde está localizado o arquivo `requirements.txt`.
-
-Se o arquivo não existir, verifique com a equipe responsável pelo projeto como obter a lista correta de dependências antes de continuar.
-
-## 6. Execute o projeto
-
-Após instalar as dependências, execute o projeto conforme as instruções específicas da aplicação.
-
-Por exemplo, se o arquivo principal for `main.py`:
-
-```bash
-python main.py
-```
-
-Substitua `main.py` pelo arquivo de entrada correto do projeto, se necessário.
-
-## 7. Desative o ambiente virtual
-
-Quando terminar de trabalhar no projeto, você pode desativar o ambiente virtual com o comando:
-
-```bash
-deactivate
-```
-
-Esse comando funciona tanto no Windows quanto no Linux.
-
-A desativação encerra o uso do ambiente virtual no terminal atual. Os arquivos e as dependências instaladas permanecem salvos na pasta `.venv`.
-
-## 8. Boas práticas
-
-- Não envie a pasta `.venv` para o GitHub.
-- Mantenha o arquivo `requirements.txt` atualizado.
-- Ative o ambiente virtual sempre que for trabalhar no projeto.
-- Instale novas dependências com o ambiente virtual ativado.
-- Não compartilhe senhas, tokens ou credenciais no repositório.
-
-Para adicionar uma nova dependência ao projeto:
-
-```bash
-python -m pip install nome-da-biblioteca
-```
-
-Para atualizar o arquivo `requirements.txt` com as dependências instaladas:
-
-```bash
-python -m pip freeze > requirements.txt
+configs/
+  data.yaml          # caminhos, envelope SP, split, malha
+  stkde.yaml         # bandas h_s/h_t, tuning e exportação
+data/
+  amostra_completa_30000.csv   # entrada (versionada)
+  processed/                   # artefatos gerados (ignorado no Git)
+scripts/
+  prepare_stkde_data.py        # passo 1
+  split_stkde_data.py          # passo 2
+  build_stkde_grid.py          # passo 3
+  run_stkde_eval.py            # passo 4
+  export_stkde_results.py      # passo 5
+src/
+  data/      # limpeza e split
+  spatial/   # malha UTM
+  stkde/     # KDE, PAI, figuras
+reports/
+  stkde/     # figuras PNG, tabela LaTeX, CSV (versionável)
 ```
 
 ---
 
-**Pronto!** Seguindo essas etapas, você terá o ambiente Python configurado e as dependências instaladas para trabalhar no projeto.
+## Pré-requisitos
+
+- **Python 3.10+** (recomendado)
+- **Git**
+
+Verifique:
+
+```powershell
+python --version
+git --version
+```
+
+---
+
+## 1. Ambiente virtual e dependências
+
+Na **raiz do repositório**:
+
+### Windows (PowerShell)
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### Linux / macOS
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+> A pasta `.venv` não vai para o Git. Sempre ative o ambiente antes de rodar os scripts.
+
+Para sair do ambiente: `deactivate`.
+
+---
+
+## 2. Pipeline STKDE — visão geral
+
+| Passo | Script | O que faz |
+|-------|--------|-----------|
+| **1** | `prepare_stkde_data.py` | Carrega o CSV, remove `(0,0)` e datas inválidas, trata hora ausente, projeta **UTM 31983**, cria `datetime_ocorrencia` e `t_horas`. |
+| **2** | `split_stkde_data.py` | **Treino:** `ANO_ARQUIVO` 2024–2025 · **Teste:** 2026. Recalcula `t_horas` com origem no treino. |
+| **3** | `build_stkde_grid.py` | Malha **500 m** (UTM) a partir do treino; atribui `cell_id` a cada evento; contagens por célula. |
+| **4** | `run_stkde_eval.py` | STKDE gaussiano, *grid search* em `h_s` e `h_t`, log-verossimilhança no teste, **PAI**, densidade no melhor par. |
+| **5** | `export_stkde_results.py` | Mapas PNG, curva PAI, heatmaps e `tab_stkde_tuning.tex` em `reports/stkde/`. |
+
+Execute **na ordem**, com o venv ativo:
+
+```powershell
+python scripts/prepare_stkde_data.py
+python scripts/split_stkde_data.py
+python scripts/build_stkde_grid.py
+python scripts/run_stkde_eval.py
+python scripts/export_stkde_results.py
+```
+
+O passo **4** pode levar alguns minutos (16 combinações × ~18k eventos de treino).
+
+---
+
+## 3. Saídas principais
+
+### `data/processed/` (local, `.gitignore`)
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `stkde_events_clean.parquet` | Eventos após limpeza |
+| `stkde_train.parquet` / `stkde_test.parquet` | Split temporal |
+| `stkde_train_grid.parquet` / `stkde_test_grid.parquet` | Eventos + célula da malha |
+| `grid_spec.json` / `grid_cells.parquet` | Definição e resumo da malha |
+| `stkde/tuning_results.csv` | Resultados do *tuning* |
+| `stkde/best_params.json` | Melhor `(h_s, h_t)` |
+| `stkde/density_best.parquet` | λ por célula (melhor modelo) |
+
+Relatórios JSON: `cleaning_report.json`, `split_report.json`, `grid_report.json`, `stkde/eval_report.json`.
+
+### `reports/stkde/` (pode ir para o Git)
+
+- `fig_stkde_densidade.png`, `fig_stkde_pai_curva.png`
+- `fig_stkde_heatmap_pai10.png`, `fig_stkde_heatmap_loglik.png`
+- `tab_stkde_tuning.tex`, `pai_curve.csv`, `export_report.json`
+
+---
+
+## 4. Configuração
+
+### `configs/data.yaml`
+
+- **`input_csv`:** amostra de entrada.
+- **Envelope lat/lon:** filtro aproximado de São Paulo.
+- **`alinhamento_ano_arquivo`:** se `true`, exige ano da data = `ANO_ARQUIVO` (padrão: `false`).
+- **`split`:** anos de treino/teste e caminhos dos artefatos limpos.
+- **`grid`:** `cell_size_m: 500`, colunas UTM, arquivos de treino/teste.
+
+### `configs/stkde.yaml`
+
+- **`h_s_list` / `h_t_list`:** bandas espacial (m) e temporal (h).
+- **`t_eval_mode`:** `median_test` (PAI/mapa no tempo mediano do teste), `max_train` ou `fixed`.
+- **`select_by`:** `loglik_test` ou `pai_at_10` para escolher o melhor par.
+- **`reports_dir`:** pasta das figuras exportadas (passo 5).
+
+Edite os YAMLs e rode de novo apenas os passos afetados (ex.: mudou só `stkde.yaml` → passos 4 e 5).
+
+---
+
+## 5. Resultados esperados (referência)
+
+Com a amostra atual, após limpeza restam **28.161** eventos; treino **18.838**, teste **9.323** (1 evento de teste pode ficar fora do *bbox* da malha).
+
+Melhor par típico do grid padrão: **`h_s = 500` m**, **`h_t = 2160` h** (~90 dias), com **PAI@10% ≈ 2,8** (sobre células com atividade — ver limitações no artigo).
+
+---
+
+## 6. Artigo LaTeX (`rp2/`)
+
+O relatório em PDF fica em outra pasta do projeto (`rp2/`, com `main.tex` e `resultados.tex`). As figuras STKDE devem estar em `rp2/figuras/` (copie de `reports/stkde/` ou regenere e copie após o passo 5).
+
+---
+
+## 7. Boas práticas
+
+- Não commitar `.venv/` nem `data/processed/`.
+- Commitar código, `configs/`, `reports/stkde/` (figuras/tabela) quando fizer sentido para o grupo.
+- Novas dependências: instale no venv e atualize `requirements.txt` com cuidado (`pip freeze` traz pacotes demais; prefira pinar só o que o projeto usa).
+
+---
+
+## 8. Solução de problemas
+
+| Problema | Ação |
+|----------|------|
+| `ImportError: pyarrow` | `pip install pyarrow` ou reinstale `requirements.txt`. |
+| Passo 2/3/4: arquivo não encontrado | Rode os passos anteriores. |
+| PowerShell bloqueia `Activate.ps1` | Ajuste a política de execução do usuário ou use CMD com `.venv\Scripts\activate.bat`. |
+| STKDE muito lento | Reduza `h_s_list`/`h_t_list` em `stkde.yaml` para testes. |
+
+---
+
+## Licença / autores
+
+Projeto acadêmico — EACH-USP, RP II (G12). Consulte o orientador sobre uso e citação dos dados SSP-SP.
