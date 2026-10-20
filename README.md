@@ -150,13 +150,7 @@ Melhor par típico do grid padrão: **`h_s = 500` m**, **`h_t = 2160` h** (~90 d
 
 ---
 
-## 6. Artigo LaTeX (`rp2/`)
-
-O relatório em PDF fica em outra pasta do projeto (`rp2/`, com `main.tex` e `resultados.tex`). As figuras STKDE devem estar em `rp2/figuras/` (copie de `reports/stkde/` ou regenere e copie após o passo 5).
-
----
-
-## 7. Boas práticas
+## 6. Boas práticas
 
 - Não commitar `.venv/` nem `data/processed/`.
 - Commitar código, `configs/`, `reports/stkde/` (figuras/tabela) quando fizer sentido para o grupo.
@@ -164,7 +158,7 @@ O relatório em PDF fica em outra pasta do projeto (`rp2/`, com `main.tex` e `re
 
 ---
 
-## 8. Solução de problemas
+## 7. Solução de problemas
 
 | Problema | Ação |
 |----------|------|
