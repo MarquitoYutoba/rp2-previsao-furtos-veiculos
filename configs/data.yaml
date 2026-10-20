@@ -1,0 +1,38 @@
+# Caminhos relativos à raiz do repositório
+input_csv: data/amostra_completa_30000.csv
+output_dir: data/processed
+
+# Envelope aproximado do município de São Paulo (WGS84)
+lat_min: -24.08
+lat_max: -23.34
+lon_min: -47.08
+lon_max: -46.34
+
+# Se true, exige ano(DATA_OCORRENCIA_BO) == ANO_ARQUIVO
+alinhamento_ano_arquivo: false
+
+# Projeção para STKDE (metros) — SIRGAS 2000 / UTM zone 23S
+utm_epsg: 31983
+
+# Split temporal STKDE (por ANO_ARQUIVO do arquivo SSP)
+split:
+  coluna_ano: ANO_ARQUIVO
+  anos_treino: [2024, 2025]
+  anos_teste: [2026]
+  # Recalcula t_horas com t0 = primeira ocorrência do treino
+  recalcular_t_horas: true
+  arquivos_entrada:
+    csv: data/processed/stkde_events_clean.csv
+    parquet: data/processed/stkde_events_clean.parquet
+
+# Malha espacial para STKDE (UTM, metros)
+grid:
+  cell_size_m: 500
+  padding_cells: 0
+  col_x: x_utm
+  col_y: y_utm
+  arquivos_entrada:
+    train_parquet: data/processed/stkde_train.parquet
+    train_csv: data/processed/stkde_train.csv
+    test_parquet: data/processed/stkde_test.parquet
+    test_csv: data/processed/stkde_test.csv

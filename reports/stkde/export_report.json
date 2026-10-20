@@ -1,0 +1,22 @@
+{
+  "best_params": {
+    "h_s": 500.0,
+    "h_t": 2160.0,
+    "t_eval": 170721.825,
+    "t_eval_mode": "median_test",
+    "select_by": "loglik_test",
+    "loglik_test": -257419.59257575736,
+    "pai_1": 4.644925981549024,
+    "pai_5": 3.4949581634842306,
+    "pai_10": 2.833083029392834,
+    "pai_20": 2.2023170993349064
+  },
+  "figuras": {
+    "densidade": "reports\\stkde\\fig_stkde_densidade.png",
+    "pai_curva": "reports\\stkde\\fig_stkde_pai_curva.png",
+    "heatmap_pai10": "reports\\stkde\\fig_stkde_heatmap_pai10.png",
+    "heatmap_loglik": "reports\\stkde\\fig_stkde_heatmap_loglik.png"
+  },
+  "tabela_latex": "reports\\stkde\\tab_stkde_tuning.tex",
+  "pai_curve_csv": "reports\\stkde\\pai_curve.csv"
+}

@@ -1,0 +1,28 @@
+# Ambiente virtual Python
+.venv/
+venv/
+
+# Cache e arquivos compilados
+__pycache__/
+*.py[cod]
+
+# Configurações locais
+.env
+.env.*
+
+# Ferramentas e editores
+.vscode/
+.idea/
+
+# Testes e cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Dados processados (gerados localmente)
+data/processed/
+data/processed/stkde/
