@@ -1,0 +1,15 @@
+# Caminhos relativos à raiz do repositório
+input_csv: data/amostra_completa_30000.csv
+output_dir: data/processed
+
+# Envelope aproximado do município de São Paulo (WGS84)
+lat_min: -24.08
+lat_max: -23.34
+lon_min: -47.08
+lon_max: -46.34
+
+# Se true, exige ano(DATA_OCORRENCIA_BO) == ANO_ARQUIVO
+alinhamento_ano_arquivo: false
+
+# Projeção para STKDE (metros) — SIRGAS 2000 / UTM zone 23S
+utm_epsg: 31983
