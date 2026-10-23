@@ -166,3 +166,33 @@ def write_tuning_latex(results: pd.DataFrame, out_path: Path) -> None:
     lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}"])
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+def plot_comparacao_pai_curve(
+    curve_stkde: pd.DataFrame,
+    curve_rf: pd.DataFrame,
+    *,
+    out_path: Path,
+) -> None:
+    """Plota as curvas PAI completas de ambos os modelos para comparação direta."""
+    fig, ax = plt.subplots(figsize=(7, 5), dpi=150)
+    
+    # Curva STKDE
+    ax.plot(curve_stkde["alpha"] * 100, curve_stkde["pai"], color="#1565c0", lw=2, label="STKDE (Ótimo)")
+    
+    # Curva Random Forest Puro
+    ax.plot(curve_rf["alpha"] * 100, curve_rf["pai"], color="#d32f2f", lw=2, ls="--", label="Random Forest (Puro)")
+    
+    # Linha de referência uniforme
+    ax.axhline(1.0, color="gray", ls=":", lw=1, label="Referência (Uniforme)")
+
+    ax.set_xlabel("Área priorizada (% das células)")
+    ax.set_ylabel("Índice de Precisão Preditiva (PAI)")
+    ax.set_title("Comparativo PAI — STKDE vs. Random Forest (Teste 2026)")
+    ax.set_xlim(0, 100)
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right")
+    fig.tight_layout()
+    
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)
