@@ -1,5 +1,5 @@
 """
-Avaliação do Random Forest com atributos espaciais e temporais agregados.
+Avaliação do Random Forest — painel célula × semana (lags T-1, T-2, T-4, perfil veicular).
 """
 
 from __future__ import annotations
@@ -9,57 +9,65 @@ import sys
 from pathlib import Path
 
 import yaml
-import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.rf.model import preparar_dataset_rf_enriquecido, treinar_e_avaliar_rf_enriquecido, pai_curve_rf
+from src.rf.model import pai_curve_rf_celulas, treinar_rf_semanal
+from src.rf.weekly import construir_painel_semanal
 
 
 def main() -> int:
-    cfg_rf = yaml.safe_load((ROOT / "configs" / "rf.yaml").read_text(encoding="utf-8"))
-    out_dir = ROOT / cfg_rf["output_dir"]
+    cfg = yaml.safe_load((ROOT / "configs" / "rf.yaml").read_text(encoding="utf-8"))
+    out_dir = ROOT / cfg["output_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    grid_cells = pd.read_parquet(ROOT / "data/processed/grid_cells.parquet")
-    # Corrigido para apontar para o parquet que possui a coluna cell_id atribuída
-    train_events_path = ROOT / "data/processed/stkde_train_grid.parquet"
+    import pandas as pd
 
-    dataset = preparar_dataset_rf_enriquecido(grid_cells, train_events_path)
+    grid_cells = pd.read_parquet(ROOT / cfg["grid_cells"])
+    painel = construir_painel_semanal(
+        train_grid=ROOT / cfg["train_grid"],
+        test_grid=ROOT / cfg["test_grid"],
+        csv_amostra=ROOT / cfg["amostra_csv"],
+        grid_cells=grid_cells,
+        anos_treino=tuple(cfg["anos_treino"]),
+        anos_teste=tuple(cfg["anos_teste"]),
+    )
+    painel.to_parquet(out_dir / "rf_panel_weekly.parquet", index=False)
 
-    features = cfg_rf["features"]
-    params = cfg_rf["model_params"]
-    alphas = [0.01, 0.05, 0.10, 0.20]
-
-    print("[INFO] Treinando Random Forest multivariado (Espacial + Temporal)...")
-    model, preds_test, metrics, pai_results = treinar_e_avaliar_rf_enriquecido(
-        dataset,
-        features=features,
-        params=params,
+    alphas = tuple(cfg.get("pai_alphas", [0.01, 0.05, 0.10, 0.20]))
+    model, teste_linhas, metrics, pai_results, ranking = treinar_rf_semanal(
+        painel,
+        features=cfg["features"],
+        params=cfg["model_params"],
         alphas=alphas,
     )
 
-    curve_rf = pai_curve_rf(preds_test)
-    curve_rf.to_csv(out_dir / "pai_curve_rf.csv", index=False, encoding="utf-8-sig")
+    curve = pai_curve_rf_celulas(ranking)
+    curve.to_csv(out_dir / "pai_curve_rf.csv", index=False, encoding="utf-8-sig")
+    ranking.to_parquet(out_dir / "rf_ranking_cells.parquet", index=False)
 
-    output_report = {
-        "metrics": metrics,
-        "pai_scores": pai_results,
+    report = {
+        "modelo": "RandomForestRegressor",
+        "painel": "celula_x_semana",
+        "features": cfg["features"],
+        "metrics_semanais_teste_2026": metrics,
+        "pai_scores_por_celula": pai_results,
+        "nota_pai": (
+            "PAI agregado por célula: soma das predições semanais 2026 ranqueada "
+            "vs n_teste (malha STKDE)."
+        ),
     }
-
-    preds_test.to_parquet(out_dir / "rf_predictions_test.parquet", index=False)
     (out_dir / "rf_eval_report.json").write_text(
-        json.dumps(output_report, ensure_ascii=False, indent=2), encoding="utf-8"
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    print(f"[OK] Random Forest treinado com sucesso!")
-    print(f"     Métricas de Teste -> RMSE: {metrics['rmse']:.3f} | MAE: {metrics['mae']:.3f} | R2: {metrics['r2']:.3f}")
-    print(f"     Desempenho PAI do RF:")
+    print(f"[OK] Painel: {len(painel):,} linhas (treino+teste)")
+    print(f"[OK] Teste semanal 2026 -> RMSE: {metrics['rmse']:.3f} | MAE: {metrics['mae']:.3f} | R2: {metrics['r2']:.3f}")
+    print("[OK] PAI (por célula, teste 2026):")
     for k, v in pai_results.items():
-        print(f"       - {k.upper()}: {v:.2f}")
-
+        print(f"     {k}: {v:.2f}")
     return 0
 
 

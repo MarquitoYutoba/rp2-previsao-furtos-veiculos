@@ -180,7 +180,7 @@ def plot_comparacao_pai_curve(
     ax.plot(curve_stkde["alpha"] * 100, curve_stkde["pai"], color="#1565c0", lw=2, label="STKDE (Ótimo)")
     
     # Curva Random Forest Puro
-    ax.plot(curve_rf["alpha"] * 100, curve_rf["pai"], color="#d32f2f", lw=2, ls="--", label="Random Forest (Puro)")
+    ax.plot(curve_rf["alpha"] * 100, curve_rf["pai"], color="#d32f2f", lw=2, ls="--", label="Random Forest (semanal)")
     
     # Linha de referência uniforme
     ax.axhline(1.0, color="gray", ls=":", lw=1, label="Referência (Uniforme)")

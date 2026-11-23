@@ -40,9 +40,9 @@ def write_comparison_latex(stkde_best: dict, rf_report: dict, out_path: Path) ->
     )
     
     # Linha Random Forest
-    rf_pais = rf_report.get("pai_scores", {})
+    rf_pais = rf_report.get("pai_scores_por_celula") or rf_report.get("pai_scores", {})
     lines.append(
-        f"Random Forest + STKDE & {rf_pais.get('pai_1', 0):.2f} & "
+        f"Random Forest (semanal) & {rf_pais.get('pai_1', 0):.2f} & "
         f"{rf_pais.get('pai_5', 0):.2f} & "
         f"{rf_pais.get('pai_10', 0):.2f} & "
         f"{rf_pais.get('pai_20', 0):.2f} \\\\"

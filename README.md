@@ -1,6 +1,6 @@
 # rp2-previsao-furtos-veiculos
 
-Pipeline de **previsão espaço-temporal de furtos de veículos** (SSP-SP, São Paulo) com **STKDE** (*Spatiotemporal Kernel Density Estimation*). O Random Forest será integrado depois; neste repositório está implementado o fluxo STKDE completo (limpeza → split temporal → malha 500 m → tuning → figuras).
+Pipeline de **previsão espaço-temporal de furtos de veículos** (SSP-SP, São Paulo) com **STKDE** e **Random Forest semanal** na mesma malha de 500 m e validação 2024–2025 / 2026.
 
 **Amostra:** 30.000 registros (`Furto (art. 155)`, `S.PAULO`), ~10.000 por ano-arquivo (2024, 2025, 2026).
 
@@ -21,10 +21,15 @@ scripts/
   build_stkde_grid.py          # passo 3
   run_stkde_eval.py            # passo 4
   export_stkde_results.py      # passo 5
+  run_rf_eval.py               # RF semanal (opção B)
+  export_final_comparison.py   # curva/tabela STKDE vs RF
 src/
   data/      # limpeza e split
   spatial/   # malha UTM
   stkde/     # KDE, PAI, figuras
+  rf/        # painel semanal, treino, PAI por célula
+configs/
+  rf.yaml
 reports/
   stkde/     # figuras PNG, tabela LaTeX, CSV (versionável)
 ```
@@ -150,7 +155,23 @@ Melhor par típico do grid padrão: **`h_s = 500` m**, **`h_t = 2160` h** (~90 d
 
 ---
 
-## 6. Boas práticas
+## 6. Random Forest semanal (opção B)
+
+Após os passos 1–3 (malha pronta):
+
+```powershell
+python scripts/run_rf_eval.py
+python scripts/export_final_comparison.py
+```
+
+- Painel **célula × semana** (2024–2026), alvo = contagem semanal.
+- Features: lags $T-1,T-2,T-4$, média trimestral histórica (treino), ciclo semanal, posição na malha, perfil veicular por célula (agregado só em 2024–2025).
+- PAI: soma das predições semanais de 2026 por célula, comparada a `n_teste` (mesmo universo de 3.443 células do STKDE).
+- Saídas: `data/processed/rf/`, `reports/stkde/fig_comparacao_stkde_rf.png`, `tab_comparativo_modelos.tex`.
+
+---
+
+## 7. Boas práticas
 
 - Não commitar `.venv/` nem `data/processed/`.
 - Commitar código, `configs/`, `reports/stkde/` (figuras/tabela) quando fizer sentido para o grupo.
@@ -158,7 +179,7 @@ Melhor par típico do grid padrão: **`h_s = 500` m**, **`h_t = 2160` h** (~90 d
 
 ---
 
-## 7. Solução de problemas
+## 8. Solução de problemas
 
 | Problema | Ação |
 |----------|------|
